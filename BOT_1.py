@@ -10,6 +10,19 @@ bot  = telebot.TeleBot("790266949:AAH5nSgi6Z-CymmNDQY0LRcQPB6mS48nadU")
 
 data = []
 
+def get_markup_price(skin):
+    url = f'https://steamcommunity.com/market/listings/730/{data[skin]}'
+    get_page = requests.get(url)
+    parser = BeautifulSoup(get_page.text,'html.parser')
+    price = parser.find_all('span' ,class_='market_listing_price market_listing_price_with_fee' )
+    parse_price = [c.text for c in price]
+    clear_price = str(parse_price)
+    clear_price = clear_price.replace('\\n', '')
+    clear_price = clear_price.replace('\\t', '')
+    clear_price = clear_price.replace('\\r', '')
+    final_price_msg = f'{data[skin]} first 10 prices :\n{clear_price}'
+    return final_price_msg
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -20,13 +33,22 @@ def start(message):
 
 @bot.message_handler(commands=['send'])
 def send_markups(message):
-   
-    markup = types.ReplyKeyboardMarkup()
-    photo = types.KeyboardButton('photo')
-    id = types.KeyboardButton('id')
-    markup.add(photo, id)
-    bot.send_message(message.chat.id,'Try to get :', reply_markup=markup)
-    
+     keyboard = InlineKeyboardMarkup()
+     keyboard.row_width = 2
+     for i in range(0, len(data)):
+        
+        keyboard.add(InlineKeyboardButton(text = f'{data[i]}', callback_data = f'data {data[i]}'))
+
+     bot.send_message(message.chat.id,'Try :',reply_markup = keyboard)
+
+@bot.callback_query_handler(func = lambda call: True)
+def answer(call):
+   for i in range(0, len(data)):
+       if call.data == f'data {data[i]}':
+          skin_price = get_markup_price(i)
+          bot.send_message(call.message.chat.id,skin_price)
+            
+
 @bot.message_handler(commands=['add'])
 def add_markups(message):
     request = bot.send_message(message.chat.id,'Send name :')
