@@ -4,7 +4,7 @@ from telebot import types
 import requests
 import bs4
 from bs4 import BeautifulSoup ,SoupStrainer
-
+from steam_logger import *
 
 bot  = telebot.TeleBot("790266949:AAH5nSgi6Z-CymmNDQY0LRcQPB6mS48nadU")
 
@@ -28,7 +28,7 @@ def get_markup_price(skin):
 def start(message):
     mess = f'Hi, <b>{message.from_user.first_name}</b>'
     bot.send_message(message.chat.id,mess,parse_mode='html')
-    
+    bot_Steam.steam_login
     
 
 @bot.message_handler(commands=['send'])
