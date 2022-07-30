@@ -6,7 +6,7 @@ import bs4
 from bs4 import BeautifulSoup ,SoupStrainer
 from steam_logger import *
 
-bot  = telebot.TeleBot("790266949:AAH5nSgi6Z-CymmNDQY0LRcQPB6mS48nadU")
+bot  = telebot.TeleBot("token")
 
 data = []
 
