@@ -76,7 +76,7 @@ inventory.go_to_inventory()
 inventory.set_game("Dota 2")
 inventory.set_marketable_items()
 inventory.open_all_items()
-          
+#not connected with telegram_bot yet;          
 
 
 
