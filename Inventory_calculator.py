@@ -6,6 +6,7 @@ class Inv_calculator(Steam_logger):
         driver.find_elements(By.XPATH, "//a[@data-tooltip-content='.submenu_username']")[1].click()
         sleep(3)
         driver.find_element(By.XPATH, "//img[@src='https://community.cloudflare.steamstatic.com/public/images/skin_1/iconInventory.png']").click()
+        #user.save_cookie()
 
     def set_game(user, game):
         driver = user.driver
@@ -21,7 +22,7 @@ class Inv_calculator(Steam_logger):
     def get_number_of_items(user, game) -> int:
         number_of_items = user.driver.find_element(By.XPATH, f"//span[text()='{game}']/following-sibling::span").text.strip('()')
 
-        return number_of_items
+        return int(number_of_items)
 
     def select_item(user, number_of_items: int):
         item_list=user.driver.find_elements(By.CLASS_NAME, "inventory_item_link")
@@ -40,8 +41,8 @@ class Inv_calculator(Steam_logger):
               name = user.get_item_name()
               price = user.get_item_price()
               total_price += price
-
-              if(count + 1 % 25 == 0) and (count != 0):
+              print(total_price)
+              if(counter + 1 % 25 == 0) and (counter != 0):
                   user.driver.find_element(By.ID, 'pagebtn_next').click()
                   sleep(2)
 
@@ -59,16 +60,17 @@ class Inv_calculator(Steam_logger):
           return name
 
     def get_item_price(user) -> float:
-        prices = user.driver.find_elements(By.XPATH, "//div[@style='min-height: 3em; margin-left:1em;']")
+        prices = user.driver.find_elements(By.XPATH, "//div[@style='min-height: 3em; margin-left: 1em;']")
 
         if prices[0].is_displayed():
             price = prices[0].text.replace(',','.').split()[1]
+            float_price = price.replace('₴','')
         else:
             price = prices[1].text.replace(',','.').split()[1]
-
+            float_price = price.replace('₴','')
         sleep(5)
 
-        return float(price)
+        return float(float_price)
 
 inventory = Inv_calculator()
 inventory.steam_login()
@@ -76,11 +78,7 @@ inventory.go_to_inventory()
 inventory.set_game("Dota 2")
 inventory.set_marketable_items()
 inventory.open_all_items()
-#not connected with telegram_bot yet;          
+inventory.save_cookie()
+inventory.close_browser()
 
-
-
-
-        
-
-
+#not connented with tg_bot
