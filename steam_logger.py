@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException, ElementNotInterac
 from selenium.webdriver.common.by import By
 from data import *
 Link = 'https://store.steampowered.com/login'
-
+Cookie_link = 'https://steamcommunity.com/'
 class Steam_logger:
     def __init__(user):
         user.username = USERNAME
@@ -31,11 +31,15 @@ class Steam_logger:
         driver.implicitly_wait(5)
 
         if os.path.exists("cookie.pieckle"):
+            driver.get(Cookie_link)
             user.load_cookie()
             user.driver.refresh()
             sleep(2)
 
         else:
+            driver.find_element(By.CLASS_NAME, 'global_action_link').click()
+            sleep(1)
+            
             driver.find_element(By.NAME, "username").send_keys(USERNAME)
             sleep(2)
 
