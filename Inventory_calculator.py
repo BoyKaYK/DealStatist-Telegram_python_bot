@@ -1,5 +1,5 @@
 from steam_logger import *
-
+market_link = 'https://steamcommunity.com/market/'
 class Inv_calculator(Steam_logger): 
     def go_to_inventory(user):
         driver = user.driver
@@ -29,7 +29,7 @@ class Inv_calculator(Steam_logger):
         item_list[number_of_items].click()
         sleep(5)
 
-    def open_all_items(user):
+    def open_all_items(user) -> float:
         counter = 0
         number_of_items = user.get_number_of_items("Dota 2")
         total_price = 0
@@ -45,6 +45,7 @@ class Inv_calculator(Steam_logger):
               if(counter + 1 % 25 == 0) and (counter != 0):
                   user.driver.find_element(By.ID, 'pagebtn_next').click()
                   sleep(2)
+              return float(total_price)
 
            except ElementNotInteractableException:
                continue
@@ -72,13 +73,43 @@ class Inv_calculator(Steam_logger):
 
         return float(float_price)
 
+    def get_balance(user) -> str:
+        str_balance = user.driver.find_element(By.XPATH, "//*[@id='header_wallet_balance']").text
+        
+        #print(str(str_balance))
+        return str(str_balance)
+   
+    def get_sell_listing(user):
+
+        user.driver.get(market_link)
+        sell_listing = user.driver.find_elements(By.CLASS_NAME,"market_listing_price")
+        size_of_list = len(sell_listing)
+        item_on_sale = sell_listing
+        for i in range(size_of_list):
+            item_on_sale[i] = sell_listing[i].text
+            print(item_on_sale[i])
+        return item_on_sale
+       
 inventory = Inv_calculator()
-inventory.steam_login()
-inventory.go_to_inventory()
-inventory.set_game("Dota 2")
-inventory.set_marketable_items()
-inventory.open_all_items()
-inventory.save_cookie()
-inventory.close_browser()
+
+    
+def calculate_my_inventory(game) -> float:
+    inventory.steam_login()
+    inventory.go_to_inventory()
+    inventory.set_game(game)    
+    inventory.set_marketable_items()
+    total_price = inventory.open_all_items()
+    return total_price
+
+
+def get_steam_balance() -> str:
+    inventory.steam_login()
+    steam_balance = inventory.get_balance()
+    return steam_balance
+
+
+def get_listings():
+    lists = inventory.get_sell_listing()
+    return lists
 
 #not connented with tg_bot
