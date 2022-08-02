@@ -21,7 +21,7 @@ class Inv_calculator(Steam_logger):
 
     def get_number_of_items(user, game) -> int:
         number_of_items = user.driver.find_element(By.XPATH, f"//span[text()='{game}']/following-sibling::span").text.strip('()')
-
+        print(number_of_items)
         return int(number_of_items)
 
     def select_item(user, number_of_items: int):
@@ -29,9 +29,9 @@ class Inv_calculator(Steam_logger):
         item_list[number_of_items].click()
         sleep(5)
 
-    def open_all_items(user) -> float:
+    def open_all_items(user, game) -> float:
         counter = 0
-        number_of_items = user.get_number_of_items("Dota 2")
+        number_of_items = user.get_number_of_items(game)
         total_price = 0
         for item in range(number_of_items):
            try:
@@ -45,10 +45,11 @@ class Inv_calculator(Steam_logger):
               if(counter + 1 % 25 == 0) and (counter != 0):
                   user.driver.find_element(By.ID, 'pagebtn_next').click()
                   sleep(2)
-              return float(total_price)
+              
 
            except ElementNotInteractableException:
                continue
+        return float(total_price)
 
     def get_item_name(user) -> str:
           names = user.driver.find_elements(By.CLASS_NAME, "hover_item_name")
@@ -98,18 +99,38 @@ def calculate_my_inventory(game) -> float:
     inventory.go_to_inventory()
     inventory.set_game(game)    
     inventory.set_marketable_items()
-    total_price = inventory.open_all_items()
+    total_price = inventory.open_all_items(game)
+    #inventory.close_browser()
     return total_price
 
 
 def get_steam_balance() -> str:
     inventory.steam_login()
     steam_balance = inventory.get_balance()
+    #inventory.close_browser()
     return steam_balance
 
 
 def get_listings():
     lists = inventory.get_sell_listing()
+    #inventory.close_browser()
     return lists
 
-#not connented with tg_bot
+
+#inventory.steam_login()
+#inventory.go_to_inventory()
+#inventory.get_balance()
+#inventory.get_sell_listing()
+#inventory.set_game("Dota 2")
+#inventory.set_marketable_items()
+#inventory.open_all_items()
+#inventory.save_cookie()
+#inventory.close_browser()
+          
+
+
+
+
+        
+
+
