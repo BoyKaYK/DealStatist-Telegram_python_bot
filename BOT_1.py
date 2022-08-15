@@ -10,7 +10,7 @@ from steam_logger import *
 from Inventory_calculator import *
 from skins_db import *
 from requests_inventory_calculator import *
-bot  = telebot.TeleBot("790266949:AAH5nSgi6Z-CymmNDQY0LRcQPB6mS48nadU")
+bot  = telebot.TeleBot("token")
 
 data = []
 
