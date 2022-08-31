@@ -14,6 +14,22 @@ class Skins_data_base:
         read_file.close()
         print(items_list)
         return items_list
+
+    def add_inventory_item(user,item,market_link):
+
+        file = open('inventory.txt','a',encoding="utf-8")
+        file.write(f"{item}\n{market_link}\n")
+        file.close()
+
+    def read_inventory_item(user):
+
+        read_file = open('inventory.txt','r',encoding="utf-8")
+        items_list = read_file.read().splitlines()
+        read_file.close()
+        print(items_list)
+        return items_list
+
+
         
 
 
