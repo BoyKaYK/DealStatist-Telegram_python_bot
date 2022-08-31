@@ -1,4 +1,5 @@
 from steam_logger import *
+from skins_db import *
 market_link = 'https://steamcommunity.com/market/'
 class Inv_calculator(Steam_logger): 
     def go_to_inventory(user):
@@ -39,6 +40,10 @@ class Inv_calculator(Steam_logger):
               counter+=1
 
               name = user.get_item_name()
+              print(name)
+              link = user.get_market_link()
+              print(link)
+              db.add_inventory_item(name,link)
               price = user.get_item_price()
               total_price += price
               print(total_price)
@@ -80,7 +85,7 @@ class Inv_calculator(Steam_logger):
         #print(str(str_balance))
         return str(str_balance)
    
-    def get_sell_listing(user):
+    def get_sell_listing(user) -> str:
 
         user.driver.get(market_link)
         sell_listing = user.driver.find_elements(By.CLASS_NAME,"market_listing_price")
@@ -89,7 +94,23 @@ class Inv_calculator(Steam_logger):
         for i in range(size_of_list):
             item_on_sale[i] = sell_listing[i].text
             print(item_on_sale[i])
-        return item_on_sale
+            item_on_sale[i] = str(item_on_sale[i]).replace('\n', ' ')
+        
+        return str(item_on_sale)
+
+
+    def get_my_inventory(user):
+        inventory_list = db.read_inventory_item()
+        return inventory_list
+    
+    def get_market_link(user):
+        
+        link = user.driver.find_element(By.XPATH, "//div[@style='height: 24px;']/a").get_attribute('href')
+        #link = user.driver.find_element(By.PARTIAL_LINK_TEXT, "https://steamcommunity.com/market/listings").text.strip('()')
+        return link
+
+
+
        
 inventory = Inv_calculator()
 
@@ -112,18 +133,23 @@ def get_steam_balance() -> str:
 
 
 def get_listings():
+    inventory.steam_login()
     lists = inventory.get_sell_listing()
-    #inventory.close_browser()
+    #lists = lists.replace('\n', '')
+   
     return lists
+
 
 
 #inventory.steam_login()
 #inventory.go_to_inventory()
 #inventory.get_balance()
+#print(get_listings())
+#sleep(20)
 #inventory.get_sell_listing()
 #inventory.set_game("Dota 2")
 #inventory.set_marketable_items()
-#inventory.open_all_items()
+#inventory.open_all_items()            
 #inventory.save_cookie()
 #inventory.close_browser()
           
