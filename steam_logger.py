@@ -40,10 +40,10 @@ class Steam_logger:
             driver.find_element(By.CLASS_NAME, 'global_action_link').click()
             sleep(1)
 
-            driver.find_element(By.NAME, "username").send_keys(USERNAME)
+            driver.find_element(By.CLASS_NAME, "newlogindialog_TextInput_2eKVn").send_keys(USERNAME)
             sleep(2)
 
-            driver.find_element(By.NAME, "password").send_keys(PASSWORD)
+            driver.find_element(By.XPATH, "//input[@type='password']").send_keys(PASSWORD)
             sleep(2)
 
             driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
@@ -65,9 +65,9 @@ class Steam_logger:
     def type_sg_code(user) -> None:
        
             code = input("CODE: ")
-            user.driver.find_element(By.XPATH, "//input[@id='twofactorcode_entry']").send_keys(code)
+            user.driver.find_element(By.XPATH, "//input[@type='text']").send_keys(code)
             sleep(2)
-            user.driver.find_element(By.CSS_SELECTOR, "div[type=submit]").click()
+            #user.driver.find_element(By.CSS_SELECTOR, "div[type=submit]").click()
             sleep(2)
 
     def get_selenium_cookie(user):
