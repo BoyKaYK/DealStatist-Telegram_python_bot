@@ -1,11 +1,12 @@
 import telebot
 from telebot import types
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+import asyncio
 from steam_logger import *
 from Inventory_calculator import *
 from skins_db import *
 from price_parser import *
+from fv_compare import *
 
 bot  = telebot.TeleBot("token")
 
@@ -17,7 +18,7 @@ def start(message):
     mess = f'Hi, <b>{message.from_user.first_name}</b>'
     bot.send_message(message.chat.id,mess,parse_mode='html')
     remove = telebot.types.ReplyKeyboardRemove()
-    mess = "/start - start_bot \n/steam_balance - calculate my steam balance \n/calculate_inventory_price - calculate my inventory price \n/add_item_to_parse - add new item to parse list \n/get_parsed_items - get all parsed items in message \n/parse_price - parse prices of all added items \n/send_parsed_items - to get parse prices in markups\n/send_my_inventory - to get your last saved inventory in markups"
+    mess = "/start - start_bot \n/steam_balance - calculate my steam balance \n/calculate_inventory_price - calculate my inventory price \n/add_item_to_parse - add new item to parse list \n/get_parsed_items - get all parsed items in message \n/parse_price - parse prices of all added items \n/send_parsed_items - to get parse prices in markups"
     bot.send_message(message.chat.id,mess,parse_mode='html', reply_markup = remove )
     
     
@@ -25,8 +26,8 @@ def start(message):
 def get_balance(message):
     st_balance = get_steam_balance()
     mess = f'Your steam balance is : <b>{st_balance}</b>'
-    bot.send_message(message.chat.id,mess,parse_mode='html')
-
+    bot.send_message(message.chat.id,mess,parse_mode='html')                                       
+                                                                                                  
 
 @bot.message_handler(commands=['calculate_inventory_price'])
 def inventory_price(message):
@@ -62,6 +63,7 @@ def answer(call):
           print("da")
           skin_price = parser.get_markup_price(i)
           bot.send_message(call.message.chat.id,skin_price)
+          
        else:
            print("nie")
 
@@ -137,14 +139,50 @@ def get_price(message):
 def get_market_listings(message):
     user_listings = get_listings()
     bot.send_message(message.chat.id,f'Your steam community listings: {user_listings}')
+fv_data = [] #hyita 
+@bot.message_handler(commands=['float_parser'])
+def parse_my_item(message):
+    request = bot.send_message(message.chat.id,'Send item name :')
+    bot.register_next_step_handler(request, fv_item_answer)
+    
+def fv_item_answer(message):
+    fv_data.append(message.text)
+    request = bot.send_message(message.chat.id,'Send item max fv :')
+    bot.register_next_step_handler(request, fv_max_answer)
+    
+def fv_max_answer(message):
+    fv_data.append(message.text)
+    fv_result = compare_fv(fv_data[1],fv_data[0])
+    bot.send_message(message.chat.id,f'Found {len(fv_result)} items {fv_data[0]} with floats :\n {fv_result}')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+    btn = types.KeyboardButton("/async_on")
+    markup.add(btn)
+    bot.send_message(message.chat.id, text="Click '/async_on' to turn on parsing for this item .".format(message.from_user), reply_markup=markup)
+    #fv_data.clear() #chistka huity 
+       
 
+async def async_fv_parse(message):
+    while True:
+        fv_max_answer(message)
+        await asyncio.sleep(10)
+        
+
+
+async def async_fv_main(message):
+    if len(fv_data) > 1 :
+        ask = asyncio.create_task(async_fv_parse(message))
+        await ask
+@bot.message_handler(commands=['async_on'])   
+def funy(message):
+    
+    asyncio.run(async_fv_main(message))
 
 @bot.message_handler(content_types=['text'])
 def get_user_text(message):
     if message.text == "photo":
         mess = "Generating photo..."
         bot.send_message(message.chat.id,mess,parse_mode='html')
-        photo = open('image.png', 'rb')
+        photo = open('image.png', 'rb')                                                              
         bot.send_photo(message.chat.id ,photo)
 
     if message.text == "id":
@@ -154,6 +192,9 @@ def get_user_text(message):
     else :
         mess = 'I dont understand you ! Use commands to use me :)'
         bot.send_message(message.chat.id,mess,parse_mode='html')
+
+
+
 
 bot.polling(none_stop=True)
 
