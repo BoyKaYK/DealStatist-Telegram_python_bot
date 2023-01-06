@@ -1,3 +1,3 @@
-USERNAME = '1212312311asa'
-PASSWORD = 'pasik'
+USERNAME = 'steam account login'
+PASSWORD = 'steam account pass'
 
